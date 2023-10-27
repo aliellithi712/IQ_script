@@ -87,8 +87,11 @@ var cellE_t = sheet.getRange("E" + selectedRow)
 
 
 
-for (var i = 1; i < selectedRow ; i++) {
 
+
+
+var limit = sheet.getRange("U" + 8).getValue();
+for(var i=1; i<=limit ; i++){
 if ((cellB == valuesO[i][0] && cellB != '') || (cellB == valuesN[i][0] && cellB != '')){
   var cell_1 = sheet.getRange("C" + selectedRow);
   var cell_2 = sheet.getRange("F" + selectedRow);
@@ -96,28 +99,23 @@ if ((cellB == valuesO[i][0] && cellB != '') || (cellB == valuesN[i][0] && cellB 
   var cell_O = sheet.getRange("O" + (i+1));
   var cell_N = sheet.getRange("N" + (i+1));
   var check = sheet.getRange("N" + (i+1)).getValue();
-
   var restOfDays = sheet.getRange("P" + (i+1));
   var startDate = new Date (sheet.getRange("R" + (i+1)).getValue());
   var endDate = new Date (sheet.getRange("S" + 2).getValue());
   var lifetime = parseInt((endDate - startDate) / 1000 / 60 / 60 / 24);
   restOfDays.setValue(lifetime);
-
-
   if (check === '--' && lifetime>30){
     cell_O.setValue(cell_O.getValue() + ' -- Expired');
-    break;
-  }
+    break;}
   else if (check !== '--' && lifetime>7){
     cell_N.setValue(cell_N.getValue() + ' -- Expired');
-    break;
-  }
-
+    break;}
   cell_1.setValue('###');
   cell_3.setValue('0');
   cell_2.setValue('0');
-}
+}}
 
+for (var i = 1; i < selectedRow ; i++) {
 
 if ((cellB == valuesP[i][0] && cellB != '') || ((valuesP[i][0].indexOf(cellB) !== -1)  && cellB != '' ) ) {
   if (valuesP[i][0].indexOf(substring) !== -1){
@@ -242,12 +240,12 @@ if (selectedColumn == 4 && e.oldValue !== cell.getValue() && cell.getValue()!= '
 
   if (cell.getValue() < 0.2) {
     col_G.setValue(10);
-  } else if (cell.getValue() >= 3.19) {
+  } else if (cell.getValue() >= 3.20) {
     col_G.setValue(35);
-  } else if (cell.getValue() - Math.floor(cell.getValue()) > 0.19) {
+  } else if (cell.getValue() - Math.floor(cell.getValue()) > 0.20) {
     col_G.setValue(10 * (Math.floor(cell.getValue()) + 1));
   } else {
     col_G.setValue(10 * Math.floor(cell.getValue()));
-  } 
+  }  
 }
 }
