@@ -26,7 +26,7 @@ setFontAndSize(rangeL, "Calibri", 12);
 /*  Write the people who flee */
 var cellP1 = sheet.getRange("L1").getValue();
 Logger.log("Cell P2 Value: " + cellP1);
-if (cellP1 == "Yes"){
+if (selectedColumn == 12 && selectedRow == 1 && cellContent == 'Yes'){
 for(var j=2 ; j< 150; j++){
 if (sheet.getRange("C"+ j).getValue() != '' && sheet.getRange("D"+j).getValue() == '') {
 var name = sheet.getRange("B" + j).getValue();
@@ -51,80 +51,88 @@ for (var i = 2; i < 150 ; i++){
 ///////////////////////////////////////////////////
 
 /*  Caught The name if flee */ 
-function setter( j ,variable, cellE_t, name) { 
+function setter( j ,variable, cellE_t, name, flag) { 
 var temp = j + 1;
 var name2 = sheet.getRange("M" + temp).getValue();
+
 if (name2 == ''){
-  var res = 35;
-  variable.setValue(  ` عليه ${res} - ${name}` ); 
-  cellE_t.setValue(res);
+  if(!flag){
+    var res = 35;
+    variable.setValue(  ` عليه ${res} - ${name}` ); 
+    cellE_t.setValue(res);
+  } 
 }
 else {
+
+  if(flag){
+    var intValue = parseInt(name2, 10); 
+    variable.setValue(  ` عليه ${intValue} - ${name}` ); 
+    cellE_t.setValue(intValue);
+  }
+  else{
   var intValue = parseInt(name2, 10); 
   var res = 35 + intValue;
-  variable.setValue(  ` عليه ${res} - ${name}` ); 
+  variable.setValue(  `  عليه ${res} - ${name}` ); 
   cellE_t.setValue(res);
+  }
 }
 }
 
 ///////////////////////////////////////////////////
 /*  Clear if name came back */
 
-if  (selectedColumn == 2 && e.oldValue !== cell.getValue()&& cell.getValue()!= ''){
+if  (selectedColumn == 2 && e.oldValue !== cell.getValue() && cell.getValue()!= ''){
 
-var substring = "عليه";
+var substringg = "عليه";
+var flag = false;
 var rangeP = sheet.getRange("L:L");
 var valuesP = rangeP.getValues();
 var rangeO = sheet.getRange("O:O");
 var valuesO = rangeO.getValues();
 var rangeN = sheet.getRange("N:N");
 var valuesN = rangeN.getValues();
-var rangeP2 = sheet.getRange("P:P");
-var valuesP2 = rangeP.getValues();
+// var rangeP2 = sheet.getRange("P:P");
+// var valuesP2 = rangeP.getValues();
 var cellB = sheet.getRange("B" + selectedRow).getValue();
 var cellB_t = sheet.getRange("B" + selectedRow)
 var cellE_t = sheet.getRange("E" + selectedRow)
 
-
-
-
-
-
 var limit = sheet.getRange("U" + 8).getValue();
 for(var i=1; i<=limit ; i++){
-if ((cellB == valuesO[i][0] && cellB != '') || (cellB == valuesN[i][0] && cellB != '')){
+
+if ((cellB == valuesO[i][0] && cellB != '') || (cellB == valuesN[i][0] && cellB != '')) {
+  var substring = "Expired";
   var cell_1 = sheet.getRange("C" + selectedRow);
   var cell_2 = sheet.getRange("F" + selectedRow);
   var cell_3 = sheet.getRange("G" + selectedRow);
-  var cell_O = sheet.getRange("O" + (i+1));
-  var cell_N = sheet.getRange("N" + (i+1));
-  var check = sheet.getRange("N" + (i+1)).getValue();
-  var restOfDays = sheet.getRange("P" + (i+1));
-  var startDate = new Date (sheet.getRange("R" + (i+1)).getValue());
-  var endDate = new Date (sheet.getRange("S" + 2).getValue());
-  var lifetime = parseInt((endDate - startDate) / 1000 / 60 / 60 / 24);
-  restOfDays.setValue(lifetime);
-  if (check === '--' && lifetime>30){
-    cell_O.setValue(cell_O.getValue() + ' -- Expired');
-    break;}
-  else if (check !== '--' && lifetime>7){
-    cell_N.setValue(cell_N.getValue() + ' -- Expired');
-    break;}
+  var cell_O = sheet.getRange("O" + (i));
+  var cell_N = sheet.getRange("N" + (i));
+
+  // var cell_11 = sheet.getRange("V" + i);
+  // cell_11.setValue(valuesO[i][0]);
+
+  if ((valuesO[i][0].indexOf(substring) !== -1) || (valuesN[i][0].indexOf(substring) !== -1)){
+    break;
+  }
+
+  flag = true;
   cell_1.setValue('###');
   cell_3.setValue('0');
   cell_2.setValue('0');
+  break;
+
 }}
 
-for (var i = 1; i < selectedRow ; i++) {
-
+var limit2 = sheet.getRange("U" + 10).getValue();
+for (var i = 1; i <= limit2 ; i++) {
 if ((cellB == valuesP[i][0] && cellB != '') || ((valuesP[i][0].indexOf(cellB) !== -1)  && cellB != '' ) ) {
-  if (valuesP[i][0].indexOf(substring) !== -1){
+  if (valuesP[i][0].indexOf(substringg) !== -1){
     var name = valuesP[i][0].split(" - ")[1];
   }
   else{
     var name = valuesP[i][0];
   }
-  setter(i , cellB_t, cellE_t, name);
+  setter(i , cellB_t, cellE_t, name, flag);
   var temp = i+1
   var cell = sheet.getRange("L" + temp);
   cell.clearContent();
@@ -139,22 +147,25 @@ if ((cellB == valuesP[i][0] && cellB != '') || ((valuesP[i][0].indexOf(cellB) !=
 ///////////////////////////////////////////////////
 /*  Subscriptions */
 
-if (selectedColumn == 14 || selectedColumn == 15 && e.oldValue !== cell.getValue()&& cell.getValue()!= '') {
+if (selectedColumn == 14 || selectedColumn == 15 && e.oldValue !== cell.getValue() && cell.getValue() !== '') {
 var restOfDays = sheet.getRange("P" + selectedRow);
 var other = sheet.getRange("R" + selectedRow);
 var startDate = new Date();
-other.setValue(startDate);
 var endDate = new Date (sheet.getRange("S" + 2).getValue());
 var lifetime = parseInt((endDate - startDate) / 1000 / 60 / 60 / 24);
-restOfDays.setValue(lifetime);
 
-if (selectedColumn == 14) {
+
+if (selectedColumn == 14 && cell.getValue() !== '') {
+  restOfDays.setValue(lifetime);
+  other.setValue(startDate);
   var fees = sheet.getRange("Q" + selectedRow);
   fees.setValue(100);
   var other = sheet.getRange("O" + selectedRow);
   other.setValue('--');
 }
-else if (selectedColumn == 15){
+else if (selectedColumn == 15 && cell.getValue() !== ''){
+  restOfDays.setValue(lifetime);
+  other.setValue(startDate);
   var fees = sheet.getRange("Q" + selectedRow);
   fees.setValue(200);
   var other = sheet.getRange("N" + selectedRow);
@@ -165,13 +176,23 @@ else if (selectedColumn == 15){
 if (selectedColumn == 21 && selectedRow == 2){
 if (cellContent == 'Yes'){
   var limit = sheet.getRange("U" + 8).getValue();
-  limit = limit + 1;
-  for(var i=2 ; i <= limit ; i++ ){
-    var restOfDays = sheet.getRange("P" + i);
-    var startDate = new Date (sheet.getRange("R" + i).getValue());
+   for(var i=2 ; i <= limit ; i++ ){
+    var cell_O = sheet.getRange("O" + (i));
+    var cell_N = sheet.getRange("N" + (i));
+    var check = sheet.getRange("N" + (i)).getValue();
+    var restOfDays = sheet.getRange("P" + (i));
+    var startDate = new Date (sheet.getRange("R" + (i)).getValue());
     var endDate = new Date (sheet.getRange("S" + 2).getValue());
     var lifetime = parseInt((endDate - startDate) / 1000 / 60 / 60 / 24);
     restOfDays.setValue(lifetime);
+    if (check === '--' && lifetime>30){
+      cell_O.setValue(cell_O.getValue() + ' -- Expired');
+      
+      }
+    else if (check !== '--' && lifetime>7){
+      cell_N.setValue(cell_N.getValue() + ' -- Expired');
+      
+      }
 
   }
 }
@@ -246,6 +267,9 @@ if (selectedColumn == 4 && e.oldValue !== cell.getValue() && cell.getValue()!= '
     col_G.setValue(10 * (Math.floor(cell.getValue()) + 1));
   } else {
     col_G.setValue(10 * Math.floor(cell.getValue()));
-  }  
+  }
+
+  
 }
+
 }
