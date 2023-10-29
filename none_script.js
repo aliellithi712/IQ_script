@@ -12,13 +12,12 @@ var selectedRow = cellRange.getRow();
 
 /*  Change the empty and do not change the changed */
 
-  if(selectedColumn != 1 && selectedColumn != 3 && selectedColumn != 4 && selectedColumn != 5){
-    if( ( selectedColumn == 12 && selectedRow != 1) || selectedColumn == 13 ){
+  if(selectedColumn != 1 && selectedColumn != 3  && selectedColumn != 14 && selectedColumn != 15 && selectedColumn != 4 && selectedColumn != 5){
+    if( selectedColumn == 12 || selectedColumn == 13 || selectedColumn == 6 || selectedColumn == 7 ){
       e.range.setValue(e.oldValue);
       e.source.toast("You cannot modify non-empty cells.");
-      return;
     }
-    if(selectedColumn == 12 && selectedRow == 1){
+    if(selectedRow == 1){
 
     }
     else{
@@ -35,10 +34,23 @@ var selectedRow = cellRange.getRow();
 
 ///////////////////////////////////////////////////
 
+/*  Restart Button */
+
+if (selectedColumn == 21 && selectedRow == 14 && cellContent =='Yes'){
+  var limit1 = sheet.getRange("U" + 12).getValue();
+  for(var i=2 ; i<= limit1; i++){
+    sheet.getRange("B" + i).setValue('none');
+    sheet.getRange("C" + i).setValue('');
+    sheet.getRange("D" + i).setValue('');
+    sheet.getRange("E" + i).setValue('');
+    sheet.getRange("F" + i).setValue('');
+    sheet.getRange("G" + i).setValue('');
+
+  }
+}
 
 
-
-
+///////////////////////////////////////////////////
 
 
 
@@ -55,9 +67,6 @@ var rangeO = sheet.getRange("O:O");
 setFontAndSize(rangeO, "Calibri", 12);
 
 ///////////////////////////////////////////////////
-
-
-
 
 
 
@@ -80,7 +89,7 @@ for (var i = 2; i <= (limit11 + 20) ; i++){
   var celltest2 = sheet.getRange("M"+ i );
   var celltest3 = sheet.getRange("C"+ j );
   var celltest4 = sheet.getRange("E"+ j );
-  if (celltest.getValue() == 'none' && ( (celltest3.getValue()!= '###' ) || ( celltest3.getValue() == '###' && celltest4.getValue() != '' ) ) ){
+  if (celltest.getValue() == '-' && ( (celltest3.getValue()!= '###' ) || ( celltest3.getValue() == '###' && celltest4.getValue() != '' ) ) ){
     celltest.setValue(name) 
     if (name2 == '') { celltest2.setValue(0) }
     else {celltest2.setValue(name2)}
@@ -94,7 +103,7 @@ function setter( j ,variable, cellE_t, name, flag) {
 var temp = j + 1;
 var name2 = sheet.getRange("M" + temp).getValue();
 
-if (name2 == ''){
+if (name2 == 0){
   if(!flag){
     var res = 35;
     variable.setValue(  ` عليه ${res} - ${name}` ); 
@@ -134,7 +143,7 @@ var cellE_t = sheet.getRange("E" + selectedRow)
 var limit = sheet.getRange("U" + 8).getValue();
 for(var i=1; i<=limit ; i++){
 
-if ((cellB == valuesO[i][0] && cellB != '') || (cellB == valuesN[i][0] && cellB != '')) {
+if ((cellB == valuesO[i][0] && cellB != 'none') || (cellB == valuesN[i][0] && cellB != 'none')) {
   var substring = "Expired";
   var cell_1 = sheet.getRange("C" + selectedRow);
   var cell_2 = sheet.getRange("F" + selectedRow);
@@ -155,7 +164,7 @@ if ((cellB == valuesO[i][0] && cellB != '') || (cellB == valuesN[i][0] && cellB 
 
 var limit2 = sheet.getRange("U" + 10).getValue();
 for (var i = 1; i <= limit2 ; i++) {
-if ((cellB == valuesP[i][0] && cellB != '') || ((valuesP[i][0].indexOf(cellB) !== -1)  && cellB != '' ) ) {
+if ((cellB == valuesP[i][0] && cellB != 'none') || ((valuesP[i][0].indexOf(cellB) !== -1)  && cellB != 'none' ) ) {
   if (valuesP[i][0].indexOf(substringg) !== -1){
     var name = valuesP[i][0].split(" - ")[1];
   }
@@ -165,9 +174,9 @@ if ((cellB == valuesP[i][0] && cellB != '') || ((valuesP[i][0].indexOf(cellB) !=
   setter(i , cellB_t, cellE_t, name, flag);
   var temp = i+1
   var cell = sheet.getRange("L" + temp);
-  cell.clearContent();
+  cell.setValue('-');
   var cell = sheet.getRange("M" + temp); 
-  cell.clearContent();
+  cell.setValue('-');
   // var cell = sheet.getRange("N" + temp);
   // cell.setValue('here');
   break;
@@ -191,7 +200,7 @@ if (selectedColumn == 14 && cell.getValue() !== '') {
   var fees = sheet.getRange("Q" + selectedRow);
   fees.setValue(100);
   var other = sheet.getRange("O" + selectedRow);
-  // other.setValue('--');
+  other.setValue('--');
 }
 else if (selectedColumn == 15 && cell.getValue() !== ''){
   restOfDays.setValue(lifetime);
@@ -199,7 +208,7 @@ else if (selectedColumn == 15 && cell.getValue() !== ''){
   var fees = sheet.getRange("Q" + selectedRow);
   fees.setValue(200);
   var other = sheet.getRange("N" + selectedRow);
-  // other.setValue('--');
+  other.setValue('--');
 }
 }
 
@@ -215,7 +224,7 @@ if (cellContent == 'Yes'){
     var endDate = new Date (sheet.getRange("S" + 2).getValue());
     var lifetime = parseInt((endDate - startDate) / 1000 / 60 / 60 / 24);
     restOfDays.setValue(lifetime);
-    if (check === '--' && lifetime>30 && cell_O.getValue().indexOf(substring) !== 1 ){
+    if (check !== '--' && lifetime>30 && cell_O.getValue().indexOf(substring) !== 1 ){
       cell_O.setValue(cell_O.getValue() + ' -- Expired'); }
     else if (check !== '--' && lifetime>7 && cell_N.getValue().indexOf(substring) !== 1 ){
       cell_N.setValue(cell_N.getValue() + ' -- Expired');
@@ -273,12 +282,21 @@ if (selectedColumn == 4 && e.oldValue !== cell.getValue() && cell.getValue()!= '
   var minutesDifference = totalMinutes2 - totalMinutes1;
   var hoursDiff = Math.floor(minutesDifference / 60);
   var minutesDiff = minutesDifference % 60;
+  sheet.getRange("Z" + 1).setValue(minutesDiff);
+
 
   if(hoursDiff < 0){
     hoursDiff += 24;
     minutesDiff = minutesDiff * -1;
+    if (minutesDiff == 0) 
+    var res = Number(hoursDiff) + (Number( minutesDiff) / 100);
+    else
+    var res = Number(hoursDiff) + (Number( 60 - minutesDiff) / 100);
   }
-  var res = Number(hoursDiff) + (Number(minutesDiff) / 100);
+  else{
+    var res = Number(hoursDiff) + (Number( minutesDiff) / 100);
+  }
+  
   
   var cell = sheet.getRange("F" + selectedRow);
   cell.setValue(res);
