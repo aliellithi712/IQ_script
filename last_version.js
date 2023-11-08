@@ -17,24 +17,35 @@ var selectedRow = cellRange.getRow();
       e.range.setValue(e.oldValue);
       e.source.toast("You cannot modify non-empty cells.");
     }
-    else if((selectedColumn == 3 || selectedColumn == 4) && (cellContent == ';' || cellContent == 'ك') && e.oldValue == '-'){
-      e.range.setValue(e.oldValue);
+    else if((selectedColumn == 3 || selectedColumn == 4) && ( (cellContent == ';' || cellContent == 'ك') && (e.oldValue == '-') ) || ((cellContent == ';;' || cellContent == 'كك') && (e.oldValue == ';') || (e.oldValue == 'ك') )){
+      e.range.setValue('-');
       e.source.toast("Time will be inserted");    
     }
+    else if((selectedColumn == 3 || selectedColumn == 4) && ( (cellContent == ';' || cellContent == 'ك') && (e.oldValue != '-') )){
+      var decimalTime = e.oldValue; // Replace with your decimal time value
+      var totalSeconds = decimalTime * 86400; // 86400 seconds in a day
+      var hours = Math.floor(totalSeconds / 3600); var minutes = Math.floor((totalSeconds % 3600) / 60); var seconds = Math.round(totalSeconds % 60);
+      var timeString = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+      e.range.setValue(timeString);
+      return;
+
+    }
+    else if (selectedColumn == 2 && (e.range.getValue() === '' ||e.range.getValue() === "" || e.range.getValue() === null) && e.oldValue === 'none') {
+      e.source.toast("You can't delete this cell");    
+      e.range.setValue('none');
+      return;
+    }
+
     else if ((selectedColumn == 14 || selectedColumn == 15) && e.oldValue ==  '-'  ){
       e.source.toast("Subscription will be inserted"); 
     }
     else{
       var newValue = e.value;
       var oldValue = e.oldValue;
-      if (oldValue !== 'none' && newValue !== oldValue) {
+      if (oldValue !== 'none' && newValue !== oldValue ) {
       e.range.setValue(e.oldValue);
       e.source.toast("You cannot modify non-empty cells.");
-      if (selectedColumn == 14 || selectedColumn == 15|| selectedColumn == 3|| selectedColumn == 4){
-        return;
-      }
-    }
-  }}       
+      if (selectedColumn == 14 || selectedColumn == 15|| selectedColumn == 3|| selectedColumn == 4){return;}}}}            
 
 
 
@@ -66,6 +77,15 @@ if (selectedColumn == 21 && selectedRow == 14 && cellContent =='Yes'){
         isfound = true;
       }}}}}
 
+    
+      var sum = 0;
+      for (var j=2 ; j<= limit1; j++){
+          var cellValue = sheet.getRange("H" + j).getValue();
+          var intValue = parseInt(cellValue, 10); // Parse as integer with base 10
+          sum += intValue;
+      }
+      sum+= sheet.getRange("T" + 7).getValue(); sum+= sheet.getRange("T" + 9).getValue();
+      sheet.getRange("U" + 15).setValue(sum);
 
 
       
@@ -80,6 +100,11 @@ if (selectedColumn == 21 && selectedRow == 14 && cellContent =='Yes'){
     }
 
 
+}
+
+
+if (selectedColumn == 21 && selectedRow == 14 && cellContent =='Hide'){
+  sheet.getRange("U" + 15).setValue('');
 }
 
 
@@ -123,7 +148,7 @@ else {
 
 /*  Clear if name came back */
 
-if  (selectedColumn == 2 && e.oldValue !== cell.getValue() && cell.getValue()!= ''){
+if  (selectedColumn == 2 && cell.getValue()!= '' && cell.getValue()!= 'none'){
 var substringg = "عليه";
 var rangeP = sheet.getRange("L:L");
 var valuesP = rangeP.getValues();
@@ -138,7 +163,7 @@ var cellE_t = sheet.getRange("E" + selectedRow)
 
 var limit2 = sheet.getRange("U" + 10).getValue();
 for (var i = 1; i <= limit2 ; i++) {
-if ((cellB == valuesP[i][0] && cellB != 'none') || ((valuesP[i][0].indexOf(cellB) !== -1)  && cellB != 'none' ) ) {
+if ( cellB == valuesP[i][0] && cellB != 'none' ) {
   if (valuesP[i][0].indexOf(substringg) !== -1){
     var name = valuesP[i][0].split(" - ")[1];
   }
@@ -165,7 +190,7 @@ if ((cellB == valuesP[i][0] && cellB != 'none') || ((valuesP[i][0].indexOf(cellB
 if ((selectedColumn == 14 || selectedColumn == 15) && cell.getValue() !== '-') {
 var restOfDays = sheet.getRange("P" + selectedRow);
 var other = sheet.getRange("R" + selectedRow);
-if (selectedColumn == 14 && cell.getValue() !== '') {
+if (selectedColumn == 14 && cell.getValue() !== '' && selectedRow != 1) {
   restOfDays.setValue(0);
   other.setValue(sheet.getRange("S" + 2).getValue());
   var fees = sheet.getRange("Q" + selectedRow);
@@ -175,14 +200,14 @@ if (selectedColumn == 14 && cell.getValue() !== '') {
   sheet.getRange("T" + 7).setValue( sheet.getRange("T" + 7).getValue() + 100  );
   
 }
-else if (selectedColumn == 15 && cell.getValue() !== ''){
+else if (selectedColumn == 15 && cell.getValue() !== '' && selectedRow != 1){
   restOfDays.setValue(0);
   other.setValue(sheet.getRange("S" + 2).getValue());
   var fees = sheet.getRange("Q" + selectedRow);
-  fees.setValue(200);
+  fees.setValue(800);
   var other = sheet.getRange("N" + selectedRow);
   other.setValue('//');
-  sheet.getRange("T" + 9).setValue( sheet.getRange("T" + 9).getValue() + 200  );
+  sheet.getRange("T" + 9).setValue( sheet.getRange("T" + 9).getValue() + 800  );
 }
 }
 
@@ -255,35 +280,13 @@ if (selectedColumn >= 3 && selectedColumn <= 4) {
     }
     }
 
-      var time = new Date();
-      var hours = time.getHours();
-      var minutes = time.getMinutes();
-      var seconds = time.getSeconds();
-      var milliseconds = time.getMilliseconds();
-      var formattedTime = hours.toString().padStart(2, '0') + ':' +
-                  minutes.toString().padStart(2, '0') + ':' +
-                  seconds.toString().padStart(2, '0')
-                  milliseconds.toString().padStart(3, '0');
+    var time = new Date();
+    var formattedTime = Utilities.formatDate(time, Session.getScriptTimeZone(), "HH:mm:ss");
     cellRange.setValue(formattedTime);
   }
-  //  else {
-  //   // Can restore it to the OLD VALUE
-  //   var password = Browser.inputBox("Ilegal Input:", Browser.Buttons.OK_CANCEL);
-  //   if (password == "myPassword") {
-  //     Browser.msgBox("Correct Password");
-  //   } else {
-  //     Browser.msgBox(`Incorrect password. Entry not allowed: `);
-  //     sheet.getActiveCell().setValue(e.oldValue);
-  //     }
-  //   }
-  }
- 
 
-
-///////////////////////////////////////////////////
-/*  Calculate the time difference */
-
-if (selectedColumn == 4 && e.oldValue !== cell.getValue() && cell.getValue()!= ''){
+  /* Calculate the Cost */
+  if (selectedColumn == 4 ){
   var result;
 
   var col_G = sheet.getRange("G" + selectedRow);
@@ -328,4 +331,6 @@ if (selectedColumn == 4 && e.oldValue !== cell.getValue() && cell.getValue()!= '
     col_G.setValue(10 * (Math.floor(cell.getValue()) + 1));
   } else {
     col_G.setValue(10 * Math.floor(cell.getValue()));
-  }}}
+  }}
+
+  } }
